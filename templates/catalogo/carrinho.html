@@ -1,0 +1,64 @@
+{% extends "catalogo/base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2>🛒 Seu Carrinho</h2>
+</div>
+
+{% if itens %}
+<div class="cart-container">
+    <div class="cart-items">
+        {% for item in itens %}
+        <div class="cart-item" data-product-id="{{ item.produto_id }}">
+            {% if item.imagem %}
+            <img src="/{{ item.imagem }}" alt="{{ item.nome }}" class="cart-item-image">
+            {% else %}
+            <div class="cart-item-image placeholder">🧀</div>
+            {% endif %}
+            
+            <div class="cart-item-info">
+                <h4 class="cart-item-name">{{ item.nome }}</h4>
+                <p class="cart-item-price">R$ {{ "%.2f"|format(item.preco) }} cada</p>
+            </div>
+            
+            <div class="cart-item-quantity">
+                <button onclick="atualizarQuantidade({{ item.produto_id }}, {{ item.quantidade - 1 }})" 
+                        class="btn-qty">-</button>
+                <span class="qty-display">{{ item.quantidade }}</span>
+                <button onclick="atualizarQuantidade({{ item.produto_id }}, {{ item.quantidade + 1 }})" 
+                        class="btn-qty">+</button>
+            </div>
+            
+            <div class="cart-item-subtotal">
+                <p>R$ {{ "%.2f"|format(item.subtotal) }}</p>
+                <button onclick="removerDoCarrinho({{ item.produto_id }})" class="btn-remove">
+                    🗑️
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="cart-summary">
+        <h3>Resumo</h3>
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <span>R$ {{ "%.2f"|format(total) }}</span>
+        </div>
+        <div class="summary-row total">
+            <span>Total</span>
+            <span>R$ {{ "%.2f"|format(total) }}</span>
+        </div>
+        <a href="/checkout" class="btn-checkout">Finalizar Compra</a>
+        <a href="/" class="btn-continue">Continuar Comprando</a>
+    </div>
+</div>
+{% else %}
+<div class="empty-cart">
+    <div class="empty-cart-icon">🛒</div>
+    <h3>Seu carrinho está vazio</h3>
+    <p>Adicione produtos para começar a comprar!</p>
+    <a href="/" class="btn-shop">Ver Produtos</a>
+</div>
+{% endif %}
+{% endblock %}

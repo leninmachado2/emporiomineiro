@@ -1,0 +1,112 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📦 Produtos</h1>
+    <a href="/admin/produtos/novo" class="btn-add">➕ Novo Produto</a>
+</div>
+
+<div class="table-container">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Imagem</th>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Preço</th>
+                <th>Estoque</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for produto in produtos %}
+            <tr>
+                <td>
+                    {% if produto.caminho_imagem %}
+                    <img src="/{{ produto.caminho_imagem }}" alt="{{ produto.nome }}" 
+                         class="thumbnail">
+                    {% else %}
+                    <div class="thumbnail placeholder">🧀</div>
+                    {% endif %}
+                </td>
+                <td>{{ produto.nome }}</td>
+                <td>{{ produto.categoria }}</td>
+                <td>R$ {{ "%.2f"|format(produto.preco) }}</td>
+                <td class="{% if produto.quantidade_estoque <= 10 %}low-stock{% endif %}">
+                    {{ produto.quantidade_estoque }}
+                </td>
+                <td>
+                    <span class="status-badge {% if produto.ativo %}status-active{% else %}status-inactive{% endif %}">
+                        {% if produto.ativo %}Ativo{% else %}Inativo{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <a href="/admin/produtos/{{ produto.id }}/editar" class="btn-edit">✏️</a>
+                    <form method="POST" action="/admin/produtos/{{ produto.id }}/deletar" 
+                          onsubmit="return confirm('Tem certeza que deseja deletar este produto?')">
+                        <button type="submit" class="btn-delete">🗑️</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .btn-add {
+        background: #27ae60;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .thumbnail {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+    
+    .thumbnail.placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ecf0f1;
+        font-size: 1.5rem;
+    }
+    
+    .btn-edit {
+        display: inline-block;
+        margin-right: 10px;
+        text-decoration: none;
+    }
+    
+    .btn-delete {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}

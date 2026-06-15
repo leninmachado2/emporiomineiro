@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empório Canastra - Catálogo</title>
+    <link rel="stylesheet" href="/static/css/catalogo.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">🧀 Empório Canastra</h1>
+                <a href="/carrinho" class="cart-icon">
+                    🛒 <span class="cart-count">{{ carrinho_itens }}</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="categories-nav">
+        <div class="container">
+            <div class="categories-list">
+                <a href="/" class="category-item {% if not categoria %}active{% endif %}">Todos</a>
+                {% for cat in categorias %}
+                <a href="/categoria/{{ cat }}" class="category-item {% if categoria == cat %}active{% endif %}">
+                    {{ cat }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 Empório Canastra - Queijos Artesanais da Serra da Canastra</p>
+            <p>📍 Retirada: BB Sede I (Qua/Qui/Sex) e BB Sede III</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/catalogo.js"></script>
+</body>
+</html>

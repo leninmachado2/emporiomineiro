@@ -1,0 +1,135 @@
+{% extends "catalogo/base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2>✅ Finalizar Compra</h2>
+</div>
+
+<div class="checkout-container">
+    <div class="checkout-form">
+        <form id="checkoutForm" onsubmit="processarCheckout(event)">
+            <div class="form-group">
+                <label for="nome">Nome Completo *</label>
+                <input type="text" id="nome" name="nome" required class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label for="telefone">Telefone (WhatsApp) *</label>
+                <input type="tel" id="telefone" name="telefone" required 
+                       placeholder="(00) 00000-0000" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label for="ponto_retirada">Ponto de Retirada *</label>
+                <select id="ponto_retirada" name="ponto_retirada" required class="form-select"
+                        onchange="toggleDataRetirada()">
+                    {% for ponto in pontos_retirada %}
+                    <option value="{{ ponto }}">{{ ponto }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group" id="data_retirada_group" style="display: none;">
+                <label for="data_retirada">Data de Retirada (BB Sede I - Qua/Qui/Sex) *</label>
+                <select id="data_retirada" name="data_retirada" class="form-select">
+                    {% for data in datas_sede_i %}
+                    <option value="{{ data }}">{{ data }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="checkout-summary">
+                <h3>Resumo do Pedido</h3>
+                {% for item in itens %}
+                <div class="summary-item">
+                    <span>{{ item.nome }} x{{ item.quantidade }}</span>
+                    <span>R$ {{ "%.2f"|format(item.subtotal) }}</span>
+                </div>
+                {% endfor %}
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span>R$ {{ "%.2f"|format(total) }}</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit">Confirmar Pedido</button>
+        </form>
+    </div>
+</div>
+
+<div id="paymentModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>💰 Pagamento via PIX</h3>
+        <div id="paymentDetails"></div>
+        <a href="/checkout/sucesso/<pedido_id>" id="btnSuccess" class="btn-success" style="display: none;">
+            Já fiz o pagamento
+        </a>
+        <button onclick="fecharModal()" class="btn-close">Fechar</button>
+    </div>
+</div>
+
+<script>
+function toggleDataRetirada() {
+    const ponto = document.getElementById('ponto_retirada').value;
+    const dataGroup = document.getElementById('data_retirada_group');
+    const dataSelect = document.getElementById('data_retirada');
+    
+    if (ponto === 'BB Sede I') {
+        dataGroup.style.display = 'block';
+        dataSelect.required = true;
+    } else {
+        dataGroup.style.display = 'none';
+        dataSelect.required = false;
+        dataSelect.value = '';
+    }
+}
+
+// Inicializar estado
+toggleDataRetirada();
+
+async function processarCheckout(event) {
+    event.preventDefault();
+    
+    const form = document.getElementById('checkoutForm');
+    const formData = new FormData(form);
+    
+    try {
+        const response = await fetch('/checkout', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            mostrarPagamento(result);
+        } else {
+            alert('Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert('Erro ao processar pedido. Tente novamente.');
+    }
+}
+
+function mostrarPagamento(result) {
+    const modal = document.getElementById('paymentModal');
+    const details = document.getElementById('paymentDetails');
+    const btnSuccess = document.getElementById('btnSuccess');
+    
+    details.innerHTML = `
+        <p><strong>Valor:</strong> R$ ${result.total.toFixed(2)}</p>
+        <p><strong>Chave PIX:</strong> ${result.pix_chave}</p>
+        <p><strong>Pix Copia e Cola:</strong></p>
+        <textarea readonly class="pix-payload">${result.pix_payload}</textarea>
+    `;
+    
+    btnSuccess.href = `/checkout/sucesso/${result.pedido_id}`;
+    btnSuccess.style.display = 'block';
+    modal.style.display = 'block';
+}
+
+function fecharModal() {
+    document.getElementById('paymentModal').style.display = 'none';
+}
+</script>
+{% endblock %}

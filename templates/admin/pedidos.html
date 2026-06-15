@@ -1,0 +1,91 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📋 Pedidos</h1>
+</div>
+
+<div class="table-container">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Telefone</th>
+                <th>Valor</th>
+                <th>Retirada</th>
+                <th>Data</th>
+                <th>Status Pagamento</th>
+                <th>Status Entrega</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td><a href="/admin/pedidos/{{ pedido.id }}" class="order-link">#{{ pedido.id }}</a></td>
+                <td>{{ pedido.cliente.nome }}</td>
+                <td>{{ pedido.cliente.telefone_whatsapp }}</td>
+                <td>R$ {{ "%.2f"|format(pedido.valor_total) }}</td>
+                <td>{{ pedido.ponto_retirada }}</td>
+                <td>{{ pedido.data_pedido.strftime('%d/%m/%Y') }}</td>
+                <td>
+                    <span class="status-badge status-{{ pedido.status_pagamento.lower() }}">
+                        {{ pedido.status_pagamento }}
+                    </span>
+                </td>
+                <td>
+                    <span class="status-badge status-{{ pedido.status_entrega.lower() }}">
+                        {{ pedido.status_entrega }}
+                    </span>
+                </td>
+                <td>
+                    <a href="/admin/pedidos/{{ pedido.id }}" class="btn-view">👁️</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .page-header {
+        margin-bottom: 20px;
+    }
+    
+    .order-link {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .btn-view {
+        text-decoration: none;
+    }
+    
+    .status-aguardando_pix {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-pago {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-cancelado {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-reservado {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .status-entregue {
+        background: #d4edda;
+        color: #155724;
+    }
+</style>
+{% endblock %}

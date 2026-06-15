@@ -1,0 +1,91 @@
+{% extends "catalogo/base.html" %}
+
+{% block content %}
+<div class="product-detail">
+    <div class="product-detail-image">
+        {% if produto.caminho_imagem %}
+        <img src="/{{ produto.caminho_imagem }}" alt="{{ produto.nome }}" class="main-image">
+        {% else %}
+        <div class="main-image placeholder">🧀</div>
+        {% endif %}
+    </div>
+    
+    <div class="product-detail-info">
+        <div class="breadcrumb">
+            <a href="/">Início</a> / 
+            <a href="/categoria/{{ produto.categoria }}">{{ produto.categoria }}</a> / 
+            {{ produto.nome }}
+        </div>
+        
+        <h1 class="product-title">{{ produto.nome }}</h1>
+        <p class="product-category-badge">{{ produto.categoria }}</p>
+        
+        {% if produto.descricao %}
+        <p class="product-description-full">{{ produto.descricao }}</p>
+        {% endif %}
+        
+        <div class="product-meta">
+            <p class="stock-info">Estoque: {{ produto.quantidade_estoque }} unidades</p>
+            <p class="price-large">R$ {{ "%.2f"|format(produto.preco) }}</p>
+        </div>
+        
+        <div class="product-actions">
+            <div class="quantity-selector">
+                <button onclick="diminuirQuantidade()" class="btn-qty">-</button>
+                <input type="number" id="quantidade" value="1" min="1" max="{{ produto.quantidade_estoque }}" class="qty-input">
+                <button onclick="aumentarQuantidade()" class="btn-qty">+</button>
+            </div>
+            <button onclick="adicionarAoCarrinho({{ produto.id }}, document.getElementById('quantidade').value)" 
+                    class="btn-add-large">
+                Adicionar ao Carrinho
+            </button>
+        </div>
+        
+        <div id="feedback"></div>
+    </div>
+</div>
+
+{% if relacionados %}
+<section class="related-products">
+    <h3>Produtos Relacionados</h3>
+    <div class="products-grid">
+        {% for prod in relacionados %}
+        <div class="product-card small">
+            {% if prod.caminho_imagem %}
+            <a href="/produto/{{ prod.id }}">
+                <img src="/{{ prod.caminho_imagem }}" alt="{{ prod.nome }}" class="product-image">
+            </a>
+            {% else %}
+            <a href="/produto/{{ prod.id }}">
+                <div class="product-image placeholder">🧀</div>
+            </a>
+            {% endif %}
+            <div class="product-info">
+                <a href="/produto/{{ prod.id }}" class="product-link">
+                    <h4 class="product-name">{{ prod.nome }}</h4>
+                </a>
+                <span class="product-price">R$ {{ "%.2f"|format(prod.preco) }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<script>
+function aumentarQuantidade() {
+    const input = document.getElementById('quantidade');
+    const max = parseInt(input.max);
+    if (parseInt(input.value) < max) {
+        input.value = parseInt(input.value) + 1;
+    }
+}
+
+function diminuirQuantidade() {
+    const input = document.getElementById('quantidade');
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
+</script>
+{% endblock %}

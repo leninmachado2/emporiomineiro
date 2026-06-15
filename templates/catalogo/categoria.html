@@ -1,0 +1,45 @@
+{% extends "catalogo/base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{{ categoria }}</h2>
+    <p>{{ produtos|length }} produtos disponíveis</p>
+</div>
+
+{% if produtos %}
+<div class="products-grid">
+    {% for produto in produtos %}
+    <div class="product-card">
+        {% if produto.caminho_imagem %}
+        <a href="/produto/{{ produto.id }}">
+            <img src="/{{ produto.caminho_imagem }}" alt="{{ produto.nome }}" class="product-image">
+        </a>
+        {% else %}
+        <a href="/produto/{{ produto.id }}">
+            <div class="product-image placeholder">🧀</div>
+        </a>
+        {% endif %}
+        <div class="product-info">
+            <a href="/produto/{{ produto.id }}" class="product-link">
+                <h4 class="product-name">{{ produto.nome }}</h4>
+            </a>
+            {% if produto.descricao %}
+            <p class="product-description">{{ produto.descricao }}</p>
+            {% endif %}
+            <div class="product-footer">
+                <span class="product-price">R$ {{ "%.2f"|format(produto.preco) }}</span>
+                <button onclick="adicionarAoCarrinho({{ produto.id }})" class="btn-add">
+                    Adicionar +
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>Nenhum produto disponível nesta categoria no momento.</p>
+    <a href="/" class="btn-back">Voltar ao início</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,224 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>📊 Dashboard</h1>
+    <p>Bem-vindo, {{ admin.username }}!</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+            <p class="stat-label">Vendas Hoje</p>
+            <p class="stat-value">R$ {{ "%.2f"|format(vendas_hoje) }}</p>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-info">
+            <p class="stat-label">Vendas Semana</p>
+            <p class="stat-value">R$ {{ "%.2f"|format(vendas_semana) }}</p>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+            <p class="stat-label">Pedidos Pendentes</p>
+            <p class="stat-value">{{ pedidos_pendentes }}</p>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info">
+            <p class="stat-label">Pedidos Hoje</p>
+            <p class="stat-value">{{ pedidos_hoje }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-sections">
+    <div class="dashboard-section">
+        <h3>⚠️ Estoque Baixo</h3>
+        {% if produtos_baixo_estoque %}
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Categoria</th>
+                        <th>Estoque</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produto in produtos_baixo_estoque %}
+                    <tr>
+                        <td>{{ produto.nome }}</td>
+                        <td>{{ produto.categoria }}</td>
+                        <td class="low-stock">{{ produto.quantidade_estoque }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>Nenhum produto com estoque baixo.</p>
+        {% endif %}
+    </div>
+    
+    <div class="dashboard-section">
+        <h3>📋 Pedidos Recentes</h3>
+        {% if pedidos_recentes %}
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos_recentes %}
+                    <tr>
+                        <td>{{ pedido.id }}</td>
+                        <td>{{ pedido.cliente.nome }}</td>
+                        <td>R$ {{ "%.2f"|format(pedido.valor_total) }}</td>
+                        <td>
+                            <span class="status-badge status-{{ pedido.status_pagamento.lower() }}">
+                                {{ pedido.status_pagamento }}
+                            </span>
+                        </td>
+                        <td>{{ pedido.data_pedido.strftime('%d/%m/%Y %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <a href="/admin/pedidos" class="btn-view-all">Ver Todos os Pedidos</a>
+        {% else %}
+        <p>Nenhum pedido recente.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .dashboard-header {
+        margin-bottom: 30px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+    }
+    
+    .stat-label {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    
+    .dashboard-sections {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+    
+    .dashboard-section {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .dashboard-section h3 {
+        margin-bottom: 15px;
+        color: #2c3e50;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .admin-table th,
+    .admin-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ecf0f1;
+    }
+    
+    .admin-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .low-stock {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+    
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-aguardando_pix {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-pago {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .btn-view-all {
+        display: inline-block;
+        margin-top: 15px;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-sections {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

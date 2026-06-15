@@ -1,0 +1,54 @@
+{% extends "catalogo/base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h2>Bem-vindo ao Empório Canastra! 🧀</h2>
+    <p>Os melhores queijos artesanais da Serra da Canastra</p>
+</div>
+
+<section class="featured">
+    <h3>🌟 Destaques</h3>
+    <div class="products-grid">
+        {% for produto in produtos_destaque %}
+        <div class="product-card">
+            {% if produto.caminho_imagem %}
+            <img src="/{{ produto.caminho_imagem }}" alt="{{ produto.nome }}" class="product-image">
+            {% else %}
+            <div class="product-image placeholder">🧀</div>
+            {% endif %}
+            <div class="product-info">
+                <h4 class="product-name">{{ produto.nome }}</h4>
+                <p class="product-category">{{ produto.categoria }}</p>
+                {% if produto.descricao %}
+                <p class="product-description">{{ produto.descricao }}</p>
+                {% endif %}
+                <div class="product-footer">
+                    <span class="product-price">R$ {{ "%.2f"|format(produto.preco) }}</span>
+                    <button onclick="adicionarAoCarrinho({{ produto.id }})" class="btn-add">
+                        Adicionar +
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="categories-section">
+    <h3>📦 Categorias</h3>
+    <div class="categories-grid">
+        {% for cat in categorias %}
+        <a href="/categoria/{{ cat }}" class="category-card">
+            <span class="category-icon">
+                {% if cat == "Queijos" %}🧀
+                {% elif cat == "Embutidos" %}🥓
+                {% elif cat == "Doces" %}🍯
+                {% endif %}
+            </span>
+            <span class="category-name">{{ cat }}</span>
+            <span class="category-count">{{ contagem_categorias[cat] }} produtos</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

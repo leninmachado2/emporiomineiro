@@ -1,0 +1,145 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{% if produto %}✏️ Editar Produto{% else %}➕ Novo Produto{% endif %}</h1>
+    <a href="/admin/produtos" class="btn-back">← Voltar</a>
+</div>
+
+<div class="form-container">
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="nome">Nome do Produto *</label>
+            <input type="text" id="nome" name="nome" required 
+                   value="{% if produto %}{{ produto.nome }}{% endif %}" class="form-input">
+        </div>
+        
+        <div class="form-group">
+            <label for="categoria">Categoria *</label>
+            <select id="categoria" name="categoria" required class="form-select">
+                {% for cat in categorias %}
+                <option value="{{ cat }}" 
+                        {% if produto and produto.categoria == cat %}selected{% endif %}>
+                    {{ cat }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="preco">Preço (R$) *</label>
+            <input type="number" id="preco" name="preco" step="0.01" required 
+                   value="{% if produto %}{{ produto.preco }}{% endif %}" class="form-input">
+        </div>
+        
+        <div class="form-group">
+            <label for="quantidade_estoque">Quantidade em Estoque *</label>
+            <input type="number" id="quantidade_estoque" name="quantidade_estoque" required 
+                   value="{% if produto %}{{ produto.quantidade_estoque }}{% endif %}" class="form-input">
+        </div>
+        
+        <div class="form-group">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" rows="4" class="form-textarea">{% if produto %}{{ produto.descricao }}{% endif %}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="imagem">Imagem do Produto</label>
+            <input type="file" id="imagem" name="imagem" accept="image/*" class="form-input">
+            {% if produto and produto.caminho_imagem %}
+            <p class="current-image">Imagem atual:</p>
+            <img src="/{{ produto.caminho_imagem }}" alt="{{ produto.nome }}" class="current-image-preview">
+            {% endif %}
+        </div>
+        
+        {% if produto %}
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="ativo" {% if produto.ativo %}checked{% endif %}>
+                Produto Ativo
+            </label>
+        </div>
+        {% endif %}
+        
+        <button type="submit" class="btn-submit">
+            {% if produto %}Atualizar Produto{% else %}Criar Produto{% endif %}
+        </button>
+    </form>
+</div>
+
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .btn-back {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+    
+    .form-textarea {
+        resize: vertical;
+    }
+    
+    .current-image {
+        margin-top: 10px;
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+    
+    .current-image-preview {
+        max-width: 200px;
+        margin-top: 10px;
+        border-radius: 5px;
+    }
+    
+    .btn-submit {
+        background: #667eea;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .btn-submit:hover {
+        background: #5568d3;
+    }
+</style>
+{% endblock %}
